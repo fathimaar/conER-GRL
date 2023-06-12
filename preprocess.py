@@ -14,10 +14,11 @@ import pickle
 import pandas as pd
 import tqdm
 
+
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score,\
                         classification_report, precision_recall_fscore_support
 
-from dataloader_1 import IEMOCAPDataset
+from dataloader import IEMOCAPDataset
 
 def get_IEMOCAP_loaders(path, batch_size, valid=0.1, num_workers=0, pin_memory=False):
 
@@ -125,7 +126,7 @@ if __name__ == '__main__':
         os.mkdir(dir_path)
     log_file = "%s/print.log" % dir_path
     f = open(log_file, "w+")
-    sys.stdout = f
+#     sys.stdout = f
     # for IEMOCAP train
     for idx in trainset_iemocap.keys:
 
@@ -136,7 +137,7 @@ if __name__ == '__main__':
         videovisual_tem = trainset_iemocap.videoVisual[idx]
         videotext_tem = trainset_iemocap.videoText[idx]
         
-        for i in range(0, len_tem-emotion_pair_size, 1):
+        for i in range(0, len_tem-emotion_pair_size):
             label_pair_tem = [lable_tem[i+j] for j in range(emotion_pair_size +1 )]
             
             videoacoustic_pair_tem = [videoacoustic_tem[i+j] for j in range(emotion_pair_size+1)]
@@ -154,15 +155,15 @@ if __name__ == '__main__':
                 video_done_tem = 1 # this current dialogue has finished without the next state
                 video_title_next_tem = 'no_next_states'
             else:
-                videoacoustic_pair_next_tem = [videoacoustic_tem[i+j+1] for j in 
+                videoacoustic_pair_next_tem = [videoacoustic_tem[i+j+1] for j in
                                                range(emotion_pair_size+1)]
                 videovisual_pair_next_tem = [videovisual_tem[i+j+1] for j in range(emotion_pair_size+1)]
                 videotext_pair_next_tem = [videotext_tem[i+j+1] for j in range(emotion_pair_size+1)]
                 video_done_tem = 0 # this current dialogue has not finished with a next state
                 video_title_next_tem = title_tem[i+1]
-
-            trainset_pair_iemocap = pd.concat([trainset_pair_iemocap, pd.DataFrame(
-                {'states_titles': video_title_tem,
+                #pd.concat([trainset_pair_iemocap, pd.DataFrame(
+            trainset_pair_iemocap = pd.concat([trainset_pair_iemocap, pd.DataFrame(              
+                [{'states_titles': video_title_tem,
                  'pair_Labels': [label_pair_tem],
                  'states_f_text': [videotext_pair_tem],
                  'states_f_audio': [videoacoustic_pair_tem], 
@@ -172,12 +173,13 @@ if __name__ == '__main__':
                  'next_states_f_audio': [videoacoustic_pair_next_tem], 
                  'next_states_f_visual': [videovisual_pair_next_tem],
                  'action': [video_correct_action_tem], 
-                 'done': [video_done_tem]})],       
-                ignore_index=True)
+                 'done': [video_done_tem]}])],       
+                 ignore_index=True)
+           
     
     trainset_pair_iemocap.index = pd.Series(trainset_pair_iemocap.states_titles)
     trainset_pair_iemocap.to_pickle('trainset_pair.pkl') # 3: step = 2 4: step = 1
-
+    print(trainset_pair_iemocap.shape)
 
     # for IEMOCAP test pair
     for idx in testset_iemocap.keys:
@@ -189,8 +191,9 @@ if __name__ == '__main__':
         videovisual_tem = testset_iemocap.videoVisual[idx]
         videotext_tem = testset_iemocap.videoText[idx]
 
-        for i in range(0, len_tem-emotion_pair_size, 1):
+        for i in range(0, len_tem-emotion_pair_size):
             label_pair_tem = [lable_tem[i+j] for j in range(emotion_pair_size+1)]
+                            #label_tem[i:i+eps+1]
             
             videoacoustic_pair_tem = [videoacoustic_tem[i+j] for j in range(emotion_pair_size+1)]
             videovisual_pair_tem = [videovisual_tem[i+j] for j in range(emotion_pair_size+1)]
@@ -214,8 +217,8 @@ if __name__ == '__main__':
                 video_done_tem = 0 # this current dialogue has not finished with a next state
                 video_title_next_tem = title_tem[i+1]
 
-            testset_pair_iemocap = pd.concat([trainset_pair_iemocap, pd.DataFrame(
-                {'states_titles': video_title_tem,
+            testset_pair_iemocap = pd.concat([testset_pair_iemocap, pd.DataFrame(
+                [{'states_titles': video_title_tem,
                  'pair_Labels': [label_pair_tem],
                  'states_f_text': [videotext_pair_tem],
                  'states_f_audio':[videoacoustic_pair_tem],
@@ -225,7 +228,7 @@ if __name__ == '__main__':
                  'next_states_f_audio': [videoacoustic_pair_next_tem], 
                  'next_states_f_visual': [videovisual_pair_next_tem],           
                  'action': [video_correct_action_tem],
-                 'done': [video_done_tem]})],
+                 'done': [video_done_tem]}])],
                 ignore_index=True)
 
     testset_pair_iemocap.index = pd.Series(testset_pair_iemocap.states_titles)

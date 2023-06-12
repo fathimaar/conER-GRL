@@ -101,10 +101,7 @@ if __name__ == '__main__':
         probability[sequence] = [i/total_emotions for i in counts]
 
                                              
-    knowledge_pair = pd.DataFrame(columns=('pair_Labels', 'Probability'))
-    knowledge_pair = pd.concat(
-        [knowledge_pair,
-      pd.DataFrame(probability.items(),columns = ['pair_Labels', 'Probability'])], ignore_index = True)
+    knowledge_pair = pd.DataFrame(probability.items(),columns = ['pair_Labels', 'Probability'])
     print(knowledge_pair)
             
     knowledge_pair.index = pd.Series(knowledge_pair.pair_Labels)
