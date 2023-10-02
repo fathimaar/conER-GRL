@@ -325,15 +325,8 @@ if __name__ == '__main__':
                 for j in range(batch_tem):
                     tem = q_values[j]
                     Y_valid.append(action[j])
-
-
-
-                    tem_pair_real = pair_Labels[j]
-                    t_0_real = tem_pair_real[0].tolist()
-                    t_1_real = tem_pair_real[1].tolist()
-                    t_2_real = tem_pair_real[2].tolist()
-
-                    t_real = str(t_0_real)+str(t_1_real)+str(t_2_real)
+                    t_real = ''.join([str(t.tolist()) for t in pair_Labels[j][:-1]])
+                  
                     if t_real in title:
                         t_t_real = p[t_real]
                     else:
