@@ -9,4 +9,6 @@ Run the code files in the following order:
 2. domain_knowledge.py
 3. ddqn_train.py
 
-
+`python3 preprocess.py --path='data/IEMOCAP_features.pkl' --emotion_pair_size=5`
+`python3 domain_knowledge.py --path='data/IEMOCAP_features.pkl' --emotion_pair_size=5`
+`python3 ddqn_training.py`
